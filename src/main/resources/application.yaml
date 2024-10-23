@@ -17,8 +17,3 @@ spring:
   properties:
     hibernate:
       format-sql: true
-
-
-logging:
-  level:
-    root: INFO
