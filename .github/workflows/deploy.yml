@@ -50,7 +50,7 @@ jobs:
         with:
           host: "194.87.244.148"
           username: "dzhambo"
-          key: ${{ SSH_PRIVATE_KEY }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             echo DB_USERNAME = ${{ secrets.DB_USERNAME }} >> env.txt
             echo DB_PASSWORD = ${{ secrets.DB_PASSWORD }} >> env.txt
