@@ -6,6 +6,7 @@ volumes:
 services:
   docker_db:
     image: postgres
+    container_name: database
     restart: always
     environment:
       POSTGRES_USER: ${DB_USERNAME}
