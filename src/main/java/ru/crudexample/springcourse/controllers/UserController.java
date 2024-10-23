@@ -22,7 +22,7 @@ public class UserController {
     public String index(Model model, HttpSession session) {
         log.info("Start page");
         log.info("This is new");
-        log.info("Значит deploy.yml работает!");
+        log.info("IT IS WORKING!!!");
         model.addAttribute("user", session.getAttribute("user"));
         return "index";
     }
