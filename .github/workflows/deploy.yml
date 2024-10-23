@@ -55,7 +55,7 @@ jobs:
           script: |
             echo DB_USERNAME = ${{ secrets.DB_USERNAME }} >> env.txt
             echo DB_PASSWORD = ${{ secrets.DB_PASSWORD }} >> env.txt
-            
+
             sudo -S docker stop example
             sudo -S docker rm example
             sudo -S docker rmi dzhambo05/example
