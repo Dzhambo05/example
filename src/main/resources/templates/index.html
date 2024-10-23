@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+<head>
+    <script
+            src="https://code.jquery.com/jquery-3.7.1.js"
+            integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+            crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+
+    <script>
+        $(document).ready(getAllUsers());
+        //Отображение всех пользователей
+        function getAllUsers() {
+
+            $.ajax({
+                url: "/rest/allUsers",
+                type: "get",
+                success: function (data) {
+                    console.log(data);
+                    for (i = 0; i < data.length; i++) {
+                        $("#all_users").append($('<tr>').append(
+                                $('<td>').append($('<span>')).text(data[i].id),
+                                $('<td>').append($('<span>')).text(data[i].name),
+                                $('<td>').append($('<span>')).text(data[i].age),
+                                $('<td>').append($('<span>')).text(data[i].email),
+                                $('<td>').append($('<span>')).text(data[i].login),
+                                $('<td>').append($('<span>')).text(data[i].roles),
+                                $('<td>').append($('<button>').text("Edit").attr({
+                                    "type" : "button",
+                                    "class": "btn btn-primary edit",
+                                    "data-bs-toggle": "modal",
+                                    "data-bs-target": "#myModal",
+                                })
+                                    .data("user", data[i])),
+                                $('<td>').append($('<button>').text("Delete").attr({
+                                    "type": "button",
+                                    "class": "btn btn-danger allDelete",
+                                    "data-bs-toggle": "modal",
+                                    "data-bs-target": "#myModalDelete",
+                                })
+                                    .data("user", data[i]))
+                            )
+                        );
+                    };
+                }
+            })
+
+        }
+
+        //Обновление пользователя
+        $(document).on("click", ".edit", function () {
+            console.log("Я пытаюсь обновить");
+            let user = $(this).data('user');
+
+            $('#updateId').val(user.id);
+            $('#updateName').val(user.name);
+            $('#updateAge').val(user.age);
+            $('#updateEmail').val(user.email);
+            $('#updateLogin').val(user.login);
+            $('#updatePassword').val(user.password);
+            $('#role option:selected').val(user.roles);
+
+        });
+
+        $(document).on("click", ".update", function () {
+            const value = {
+                id: $("#updateId").val(),
+                name: $("#updateName").val(),
+                age: $("#updateAge").val(),
+                email: $("#updateEmail").val(),
+                login: $("#updateLogin").val(),
+                password: $("#updatePassword").val(),
+                roles: $("#updateRole option:selected").text()
+            }
+            $.ajax({
+                url: '/rest/update',
+                type: 'post',
+                data: value,
+                timeout: 100,
+                success: function () {
+                    console.log("Обновление прошло успешно!");
+                    getAllUsers();
+                }
+            });
+        });
+
+
+        //Удаление пользователя
+        $(document).on("click", ".allDelete", function () {
+            console.log("Я пытаюсь удалить");
+            let user = $(this).data('user');
+
+            $('#deleteId').val(user.id);
+            $('#deleteName').val(user.name);
+            $('#deleteAge').val(user.age);
+            $('#deleteEmail').val(user.email);
+            $('#deleteLogin').val(user.login);
+            $('#deletePassword').val(user.password);
+            $('#deleteRole option:selected').val(user.roles);
+
+            $(document).on("click", ".delete", function () {
+
+                $.ajax({
+                    url: 'rest/delete',
+                    type: 'post',
+                    data: {id: $('#deleteId').val()},
+                    success: function () {
+                        console.log("Удаление прошло успешно!");
+                        getAllUsers();
+                    }
+                });
+            });
+        });
+
+
+        //Добавление пользователя
+        $(document).on("click", ".create", function () {
+            const value = {
+                name: $("#name").val(),
+                age: $("#age").val(),
+                email: $("#email").val(),
+                login: $("#login").val(),
+                password: $("#password").val(),
+                roles: $("#role option:selected").text()
+            }
+            $.ajax({
+                url: 'rest/add',
+                type: 'post',
+                data: value,
+                timeout: 100,
+                success: function () {
+                    console.log("Добавление прошло успешно!");
+                    getAllUsers();
+                }
+            });
+        });
+
+        $(document).ready(getUser());
+        function getUser() {
+
+            $.ajax({
+                type: 'get',
+                url: '/rest/getUser',
+                success: function (user) {
+                    if (user.roles.trim() === 'USER' ) {
+                        $('#nav-user').trigger('click');
+                        $('#nav-admin').hide();
+                    }
+                    $("#userInfo").append($('<tr>').append(
+                        $('<td>').append($('<span>')).text(user.id),
+                        $('<td>').append($('<span>')).text(user.name),
+                        $('<td>').append($('<span>')).text(user.age),
+                        $('<td>').append($('<span>')).text(user.email),
+                        $('<td>').append($('<span>')).text(user.login),
+                        $('<td>').append($('<span>')).text(user.roles)
+                    ))
+                }
+            })
+        }
+
+
+    </script>
+</head>
+<body class="bg-light">
+    <div class="container-fluid">
+            <div class="row">
+                <div class="col bg-dark">
+                    <nav class="navbar navbar-light bg-dark">
+                    <span class="navbar-text text-white">
+                        <b><td th:text="${user.email}"></td></b>
+                            <td>with roles:</td>
+                            <td th:text="${user.roles}"></td>
+                    </span>
+                            <a href="/logout" class="btn btn-primary">Выход</a>
+                    </nav>
+                </div>
+            </div>
+
+        <div class="row h-100 ">
+            <div class="col-2  bg-white list-group">
+                <nav>
+                    <div class="nav flex-column" id="nav-tab-all" role="tablist">
+                        <button class="nav-link active" id="nav-admin" data-bs-toggle="tab" data-bs-target="#admin" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Admin</button>
+                        <button class="nav-link" id="nav-user" data-bs-toggle="tab" data-bs-target="#user" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">User</button>
+                    </div>
+                </nav>
+            </div>
+
+            <div class="col my-3 mx-3 tab-content">
+                <div class="tab-pane active" id="admin">
+                    <h1>Admin panel </h1>
+                    <nav>
+                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                            <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Users table</button>
+                            <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">New user</button>
+                        </div>
+                    </nav>
+                    <div class="tab-content" id="nav-tabContent">
+                        <div class="tab-pane fade show active" id="nav-home">
+                            <table class="table" id="get_users">
+                                <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Age</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Login</th>
+                                    <th scope="col">Role</th>
+                                    <th scope="col">Edit</th>
+                                    <th scope="col">Delete</th>
+                                </tr>
+                                </thead>
+                                <tbody id="all_users">
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="tab-pane fade" id="nav-profile">
+                            <div class="px-3 py-2 bg-light text-dark">
+                                <h2>Add new user</h2>
+                            </div>
+                            <form id="form">
+                                <div class="col-md-8 mx-auto">
+                                    <label for="name" class="form-label">Введите имя</label>
+                                    <input type="text" name="name" id="name" placeholder="Введите имя" class="form-control"><br>
+                                </div>
+                                <div class="col-md-8 mx-auto">
+                                    <label for="age" class="form-label">Возраст</label>
+                                    <input type="text" name="age" id="age" placeholder="Введите возраст" class="form-control"><br>
+                                </div>
+                                <div class="col-md-8 mx-auto">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="text" name="email" id="email" placeholder="Введите email" class="form-control"><br>
+                                </div>
+                                <div class="col-md-8 mx-auto">
+                                    <label for="login" class="form-label">Логин</label>
+                                    <input type="text" name="login" id="login" placeholder="Введите логин" class="form-control"><br>
+                                </div>
+                                <div class="col-md-8 mx-auto">
+                                    <label for="password" class="form-label">Пароль</label>
+                                    <input type="text" name="password" id="password" placeholder="Введите пароль" class="form-control"><br>
+                                </div>
+                                <div class="col-md-8 mx-auto">
+                                    <select id="role" class="form-select md-8" aria-label="Пример выбора по умолчанию" name="select">
+                                        <option value="1">ADMIN</option>
+                                        <option value="2">USER</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-8 mx-auto p-3">
+                                    <button type="submit" class="btn btn-success create">Add new user</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="user">
+                    <h2>User information-page</h2>
+                    <div class="row">
+                        <div class="col  mx-3 border border-light  " style="background-color: #f5f5f5  ">
+                            <h5>About user</h5>
+
+                            <div class="row bg-white ">
+                                <div class="col my-3  ">
+                                    <table class="table table-striped  ">
+                                        <thead>
+                                        <tr>
+                                            <th scope="col">ID</th>
+                                            <th scope="col">Name</th>
+                                            <th scope="col">Age</th>
+                                            <th scope="col">Email</th>
+                                            <th scope="col">Login</th>
+                                            <th scope="col">Role</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="userInfo">
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <form class="formEditUser">
+                <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="ModalLabel">Редактирование пользователя</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="updateForm">
+                                    <div class="col-md-8 mx-auto">
+                                        <label for="updateId" class="form-label">ID</label>
+                                        <input type="text" name="id" id="updateId" placeholder="Введите имя" class="form-control" disabled><br>
+                                    </div>
+                                    <div class="col-md-8 mx-auto">
+                                        <label for="updateName" class="form-label">Введите имя</label>
+                                        <input type="text" name="updateName" id="updateName" placeholder="Введите имя" class="form-control"><br>
+                                    </div>
+                                    <div class="col-md-8 mx-auto">
+                                        <label for="updateAge" class="form-label">Возраст</label>
+                                        <input type="text" name="updateAge" id="updateAge" placeholder="Введите возраст" class="form-control"><br>
+                                    </div>
+                                    <div class="col-md-8 mx-auto">
+                                        <label for="updateEmail" class="form-label">Email</label>
+                                        <input type="text" name="updateEmail" id="updateEmail" placeholder="Введите email" class="form-control"><br>
+                                    </div>
+                                    <div class="col-md-8 mx-auto">
+                                        <label for="updateLogin" class="form-label">Логин</label>
+                                        <input type="text" name="updateLogin" id="updateLogin" placeholder="Введите логин" class="form-control"><br>
+                                    </div>
+                                    <div class="col-md-8 mx-auto">
+                                        <label for="updatePassword" class="form-label">Пароль</label>
+                                        <input type="text" name="updatePassword" id="updatePassword" placeholder="Введите пароль" class="form-control"><br>
+                                    </div>
+                                    <div class="col-md-8 mx-auto">
+                                        <select id="updateRole" class="form-select md-8" aria-label="Пример выбора по умолчанию" name="select">
+                                            <option value="1">ADMIN</option>
+                                            <option value="2">USER</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-8 mx-auto">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                        <button type="submit" class="btn btn-primary update">Сохранить изменения</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div>
+            <form class="formDeleteUser">
+                <div class="modal fade" id="myModalDelete" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Удаление пользователя</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="deleteForm">
+                                    <div class="col-md-8 mx-auto">
+                                        <label for="updateId" class="form-label">ID</label>
+                                        <input type="text" name="id" id="deleteId" placeholder="Введите имя" class="form-control" disabled><br>
+                                    </div>
+                                    <div class="col-md-8 mx-auto">
+                                        <label for="updateName" class="form-label">Введите имя</label>
+                                        <input type="text" name="updateName" id="deleteName" placeholder="Введите имя" class="form-control" disabled><br>
+                                    </div>
+                                    <div class="col-md-8 mx-auto">
+                                        <label for="updateAge" class="form-label">Возраст</label>
+                                        <input type="text" name="updateAge" id="deleteAge" placeholder="Введите возраст" class="form-control" disabled><br>
+                                    </div>
+                                    <div class="col-md-8 mx-auto">
+                                        <label for="updateEmail" class="form-label">Email</label>
+                                        <input type="text" name="updateEmail" id="deleteEmail" placeholder="Введите email" class="form-control" disabled><br>
+                                    </div>
+                                    <div class="col-md-8 mx-auto">
+                                        <label for="updateLogin" class="form-label">Логин</label>
+                                        <input type="text" name="updateLogin" id="deleteLogin" placeholder="Введите логин" class="form-control" disabled><br>
+                                    </div>
+                                    <div class="col-md-8 mx-auto">
+                                        <label for="updatePassword" class="form-label">Пароль</label>
+                                        <input type="text" name="updatePassword" id="deletePassword" placeholder="Введите пароль" class="form-control" disabled><br>
+                                    </div>
+                                    <div class="col-md-8 mx-auto">
+                                        <select id="deleteRole" class="form-select md-8" aria-label="Пример выбора по умолчанию" name="select" disabled>
+                                            <option value="1">ADMIN</option>
+                                            <option value="2">USER</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-8 mx-auto">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                        <button type="submit" class="btn btn-primary delete">Удалить пользователя</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+</body>
+</html>
