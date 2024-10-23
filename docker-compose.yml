@@ -2,7 +2,6 @@ version: '3.1'
 
 volumes:
   spring_docker:
-  elasticsearch:
 
 services:
   docker_db:
