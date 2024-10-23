@@ -4,3 +4,59 @@ on:
   push:
     branches:
       - main
+
+jobs:
+  build_and_push:
+    name: Push image to Dockerhub
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Login to Dockerhub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Review Bot Build and Push to Dockerhub
+          uses: docker/build-push-action@v2
+          with:
+            file: ./Dockerfile
+            push: true
+            tags: dzhambo05/example
+
+  push_compose:
+    name: Push docker-compose.yaml to server
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Copy docker-compose.yml to server
+        uses: appleboy/scp-action@master
+        with:
+          host: "194.87.244.148"
+          username: "dzhambo"
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "docker-compose.yml"
+          target: "/home/dzhambo"
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: [push_compose, build_and_push]
+    steps:
+      - name: Connect with SSH and Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: "194.87.244.148"
+          username: "dzhambo"
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            echo DB_USERNAME = ${{ secrets.DB_USERNAME }} >> env.txt
+            echo DB_PASSWORD = ${{ secrets.DB_PASSWORD }} >> env.txt
+            
+            sudo -S docker stop example
+            sudo -S docker rm example
+            sudo -S docker rmi dzhambo05/example
+            sudo -S docker compose -f docker-compose.yml --env-file=env.txt up -d
+            sudo -S docker ps -a
