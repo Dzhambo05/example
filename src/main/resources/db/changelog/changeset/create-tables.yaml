@@ -1,0 +1,106 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-users
+      author: dzhambo
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  name: age
+                  type: INTEGER
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: users_pkey
+                  name: id
+                  type: UUID
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+              - column:
+                  name: login
+                  type: VARCHAR(255)
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: password
+                  type: VARCHAR(255)
+            tableName: users
+  - changeSet:
+      id: create-users-2
+      author: dzhambo
+      changes:
+        - addUniqueConstraint:
+            columnNames: login
+            constraintName: users_login_key
+            tableName: users
+  - changeSet:
+      id: create-roles
+      author: dzhambo
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: roles_pkey
+                  name: id
+                  type: UUID
+              - column:
+                  name: role
+                  type: VARCHAR(255)
+            tableName: roles
+  - changeSet:
+      id: create-users_roles
+      author: dzhambo
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: users_roles_pkey
+                  name: roles_id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: users_roles_pkey
+                  name: user_id
+                  type: UUID
+            tableName: users_roles
+  - changeSet:
+      id: add-foreign-key-to-users-table
+      author: dzhambo
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: users_roles
+            constraintName: fk2o0jvgh89lemvvo17cbqvdxaa
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+  - changeSet:
+      id: add-foreign-key-to-roles-table
+      author: dzhambo
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: roles_id
+            baseTableName: users_roles
+            constraintName: fka62j07k5mhgifpp955h37ponj
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: roles
+            validate: true
