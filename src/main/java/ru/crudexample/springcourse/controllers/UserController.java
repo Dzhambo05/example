@@ -20,8 +20,7 @@ public class UserController {
 
     @GetMapping("/index")
     public String index(Model model, HttpSession session) {
-        log.info("Start page");
-        log.info("Update main page");
+        log.info("Start page - 5.1.5");
         model.addAttribute("user", session.getAttribute("user"));
         return "index";
     }
