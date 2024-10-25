@@ -1,7 +1,7 @@
 version: '3.1'
 
 volumes:
-  spring_docker:
+  spring_liquibase:
 
 services:
   docker_db:
@@ -11,9 +11,9 @@ services:
     environment:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: "spring_docker"
+      POSTGRES_DB: "spring_liquibase"
     volumes:
-      - spring_docker:/var/lib/postgresql/data
+      - spring_liquibase:/var/lib/postgresql/data
     ports:
       - "127.0.0.1:5433:5432"
 
@@ -27,10 +27,10 @@ services:
       - docker_db
     environment:
       SPRING_APPLICATION_JSON: '{
-              "spring.datasource.url"  : "jdbc:postgresql://docker_db:5432/spring_docker",
+              "spring.datasource.url"  : "jdbc:postgresql://docker_db:5432/spring_liquibase",
               "spring.datasource.username" : "${DB_USERNAME}",
               "spring.datasource.password" : "${DB_PASSWORD}",
               "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.PostgreSQLDialect",
-              "spring.jpa.hibernate.ddl-auto" : "update"
+              "spring.jpa.hibernate.ddl-auto" : "none"
             }'
       JAVA_OPTS: '-Xmx512m'
