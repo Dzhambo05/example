@@ -21,6 +21,7 @@ public class UserController {
     @GetMapping("/index")
     public String index(Model model, HttpSession session) {
         log.info("Start page - 5.1.5");
+        log.info("Start page - 5.1.5. Liquibase was added");
         model.addAttribute("user", session.getAttribute("user"));
         return "index";
     }
