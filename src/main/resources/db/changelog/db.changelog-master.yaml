@@ -3,3 +3,5 @@ databaseChangeLog:
       file: db/changelog/changeset/create-tables.yaml
   - include:
       file: db/changelog/changeset/change-users-name-column.yaml
+  - include:
+      file: db/changelog/changeset/change-back.yaml
