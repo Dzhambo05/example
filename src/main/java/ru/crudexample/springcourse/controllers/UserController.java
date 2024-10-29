@@ -23,6 +23,7 @@ public class UserController {
         log.info("Start page - 5.1.5");
         log.info("Start page - 5.1.5. Liquibase was added");
         log.info("All works!");
+        log.info("Hope");
         model.addAttribute("user", session.getAttribute("user"));
         return "index";
     }
