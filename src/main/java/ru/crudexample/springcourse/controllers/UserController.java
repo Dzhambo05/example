@@ -22,8 +22,7 @@ public class UserController {
     public String index(Model model, HttpSession session) {
         log.info("Start page - 5.1.5");
         log.info("Start page - 5.1.5. Liquibase was added");
-        log.info("All works!");
-        log.info("Hope");
+        log.info("YES!");
         model.addAttribute("user", session.getAttribute("user"));
         return "index";
     }
